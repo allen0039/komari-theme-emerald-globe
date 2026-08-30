@@ -1,73 +1,45 @@
-<h3 align="center"> Komari Emerald </h3>
+<h3 align="center">Komari Emerald Globe</h3>
 <p align="center">
-基于 Vue 3 + Vite + reka-ui + Tailwind CSS v4 构建的 Komari Monitor 主题
+基于 Komari Emerald 二次开发，加入真实彩色地球、跨地区连接线与实时传输速率。
 </p>
 
 ![preview](/docs/preview.png)
 
+## 主要改动
+
+- 使用 Three.js 与 Globe.gl 渲染彩色昼间/夜间地球
+- 保留节点地区国旗、跨地区连接线及实时上下行速率
+- 支持自动旋转、拖拽浏览、静止模式和亮色/暗色主题
+- 页面不可见时暂停渲染，兼顾桌面端与移动端性能
+
 ## 使用
 
-1. 从 [Release 页面](https://github.com/Tokinx/komari-theme-emerald/releases) 下载最新的 `komari-theme-emerald-build-*.zip` 文件
-2. 登录 Komari Monitor 后，点击 `设置`，选择 `主题管理` 选项卡
-3. 点击 `上传主题` 按钮，选择下载的 `komari-theme-emerald-build-*.zip` 文件
-4. 刷新页面，即可看到新的主题
-
-## 环境要求
-
-- Node.js: `^20.19.0` 或 `>=22.12.0`
-- Bun: `>=1.2.0`
+1. 从 [Release 页面](https://github.com/allen0039/komari-theme-emerald-globe/releases) 下载最新的 `komari-theme-emerald-globe-build-*.zip`
+2. 登录 Komari Monitor，进入 `设置` -> `主题管理`
+3. 点击 `上传主题`，选择下载的 ZIP 文件
+4. 刷新页面
 
 ## 开发
 
+环境要求：Node.js `^20.19.0` 或 `>=22.12.0`，Bun `>=1.2.0`。
+
 ```bash
-# 安装依赖
 bun install
-
-# 启动开发服务器
 bun run dev
-
-# 代码检查
 bun run lint
-```
-
-## 构建
-
-```bash
-# 类型检查 + 生产构建
 bun run build
-
-# 预览生产构建
-bun run preview
 ```
 
 ## 技术栈
 
-| 类别     | 技术                             |
-| -------- | -------------------------------- |
-| 框架     | Vue 3                            |
-| 构建工具 | Vite 7                           |
-| UI 组件  | reka-ui（shadcn-vue 风格组件）   |
-| 样式方案 | Tailwind CSS v4 + tw-animate-css |
-| 状态管理 | Pinia 3                          |
-| 路由     | Vue Router 5                     |
-| 提示系统 | vue-sonner（Toaster）            |
-| 图标     | @iconify/vue                     |
-| 图表     | vue-echarts                      |
-| 3D 地球  | cobe                             |
-| 实用工具 | @vueuse/core, dayjs              |
-| 代码规范 | ESLint (@antfu/eslint-config)    |
+Vue 3、Vite 7、Tailwind CSS 4、reka-ui、Pinia、ECharts、Three.js、Globe.gl。
 
 ## 鸣谢
 
 - [Komari](https://github.com/komari-monitor/komari)
-- [Komari Next](https://github.com/tonyliuzj/komari-next)
-- [Komari Naive](https://github.com/lyimoexiao/komari-theme-naive)
-- [Vue 3](https://vuejs.org/)
-- [Vite](https://vitejs.dev/)
-- [reka-ui](https://reka-ui.com/)
-- [Tailwind CSS](https://tailwindcss.com/)
-
-本主题基座基于 [Komari Naive](https://github.com/lyimoexiao/komari-theme-naive)，特此感谢
+- [Komari Emerald](https://github.com/Tokinx/komari-theme-emerald)，本主题的上游项目
+- [Komari Glassmorphism](https://github.com/sanrokamlan-prog/komari-theme-Glassmorphism)，彩色地球实现与纹理参考
+- [Komari Naive](https://github.com/lyimoexiao/komari-theme-naive)，Emerald 的主题基座
 
 ## License
 

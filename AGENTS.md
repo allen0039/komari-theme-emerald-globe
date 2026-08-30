@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Repo guide for `komari-theme-emerald`.
+Repo guide for `komari-theme-emerald-globe`.
 
 ## Snapshot
 
@@ -54,7 +54,7 @@ Notes:
 Expected output:
 
 - `dist/`
-- `komari-theme-emerald-build-<sha>.zip`
+- `komari-theme-emerald-globe-build-<sha>.zip`
 
 Zip contents:
 
@@ -104,7 +104,7 @@ Contributor density, useful for triage:
 - Preserve the `@` alias to `src` defined in `vite.config.ts`
 - Treat `komari-theme.json` as release input, not optional metadata
 - Treat `docs/preview.png` as release input, not just documentation art
-- Respect existing generated outputs and naming patterns, especially `komari-theme-emerald-build-<sha>.zip`
+- Respect existing generated outputs and naming patterns, especially `komari-theme-emerald-globe-build-<sha>.zip`
 - Root verification is lint plus build, not tests
 - UI is built on `reka-ui` + Tailwind CSS v4 (shadcn-vue style under `src/components/ui/`). Do **not** reintroduce Naive UI, UnoCSS, or SCSS — they have been removed.
 

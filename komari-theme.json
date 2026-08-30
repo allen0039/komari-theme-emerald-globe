@@ -1,14 +1,14 @@
 {
-  "name": "Komari Emerald",
-  "short": "Emerald",
-  "description": "An emerald theme for Komari",
-  "version": "1.0.11",
-  "author": "Tokinx",
-  "url": "https://github.com/Tokinx/komari-theme-emerald",
+  "name": "Komari Emerald Globe",
+  "short": "Emerald Globe",
+  "description": "Komari Emerald with a realistic interactive globe",
+  "version": "1.0.0",
+  "author": "Davies_Allen",
+  "url": "https://github.com/allen0039/komari-theme-emerald-globe",
   "preview": "preview.png",
   "configuration": {
     "type": "managed",
-    "name": "Emerald 设置",
+    "name": "Emerald Globe 设置",
     "data": [
       { "name": "基础设置", "type": "title" },
       { "key": "dataUpdateInterval", "name": "数据更新间隔", "type": "number", "default": 3, "help": "实时数据刷新间隔，单位：秒（建议 1-10 秒）" },
