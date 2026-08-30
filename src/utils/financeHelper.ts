@@ -82,6 +82,8 @@ interface ExchangeRatesCache {
 }
 
 const CACHE_KEY = 'komari_finance_exchange_rates_cny_v1'
+const EXCLUDED_NODE_UUIDS_KEY = 'komari_personal_finance_excluded_node_uuids_v1'
+const PERSONAL_FINANCE_CURRENCY_KEY = 'komari_personal_finance_currency_v1'
 const MS_PER_DAY = 24 * 60 * 60 * 1000
 const MONTH_DAYS = 30
 const LONG_TERM_YEARS = 100
@@ -169,6 +171,36 @@ export function getStoredFinanceCurrency(): CurrencyCode {
 
 export function setStoredFinanceCurrency(currency: CurrencyCode): void {
   setLocalStorageItem('fin_currency', currency)
+}
+
+export function getStoredPersonalFinanceCurrency(): CurrencyCode {
+  return normalizeCurrency(getLocalStorageItem(PERSONAL_FINANCE_CURRENCY_KEY) || 'CNY')
+}
+
+export function setStoredPersonalFinanceCurrency(currency: CurrencyCode): void {
+  setLocalStorageItem(PERSONAL_FINANCE_CURRENCY_KEY, currency)
+}
+
+export function getExcludedFinanceNodeUuids(): string[] {
+  const rawValue = getLocalStorageItem(EXCLUDED_NODE_UUIDS_KEY)
+  if (!rawValue)
+    return []
+
+  try {
+    const value = JSON.parse(rawValue)
+    if (!Array.isArray(value))
+      return []
+
+    return [...new Set(value.filter((uuid): uuid is string => typeof uuid === 'string' && uuid.length > 0))]
+  }
+  catch {
+    return []
+  }
+}
+
+export function setExcludedFinanceNodeUuids(uuids: Iterable<string>): void {
+  const value = [...new Set(uuids)].filter(uuid => uuid.length > 0)
+  setLocalStorageItem(EXCLUDED_NODE_UUIDS_KEY, JSON.stringify(value))
 }
 
 export function calculateTotalRemainingValueCNY(

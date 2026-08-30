@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
-import { computed, inject, ref } from 'vue'
+import { computed, defineAsyncComponent, inject, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -9,6 +9,7 @@ import { useAppStore } from '@/stores/app'
 
 const router = useRouter()
 const appStore = useAppStore()
+const PersonalFinanceDialog = defineAsyncComponent(() => import('@/components/PersonalFinanceDialog.vue'))
 
 const isScrolled = inject<ReturnType<typeof ref<boolean>>>('isScrolled', ref(false))
 
@@ -63,6 +64,7 @@ const sitename = computed(() => appStore.publicSettings?.sitename || 'Komari Mon
         </h3>
       </div>
       <div class="flex items-center gap-2">
+        <PersonalFinanceDialog />
         <DataTooltip v-for="button in actionButtons" :key="button.action" :content="button.title" placement="left" content-class="whitespace-nowrap text-[11px] px-2">
           <Button variant="ghost" size="icon-sm" @click="handleButtonClick(button.action)">
             <Icon :icon="button.icon" :width="18" :height="18" />
