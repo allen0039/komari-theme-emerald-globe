@@ -229,19 +229,39 @@ function openPingDialog() {
               </DataTooltip>
             </div>
             <template v-if="!appStore.showPingNetworkDetails">
-              <div class="flex items-center justify-between">
+              <div class="flex min-w-0 items-center">
                 <span class="truncate">
                   三网
                 </span>
                 <div class="border-t-2 border-dotted border-gray-500/10 mx-2 flex-1" />
-                <div v-if="topPingNetworks.length > 0" class="flex flex-row">
+                <div v-if="topPingNetworks.length > 0" class="flex shrink-0 items-center">
                   <DataTooltip
                     v-for="(net, index) in topPingNetworks" :key="net.name" placement="top"
                     :content="`${net.name}\n延迟 ${net.latency}\n丢包 ${net.loss}`" content-class="whitespace-pre-wrap w-max px-1.5 !leading-[1.2] text-[11px]"
                   >
-                    <div class="truncate">
+                    <div class="flex items-center whitespace-nowrap">
                       <span v-if="index" class="mx-1">·</span>
                       <span :class="net.latencyToneClass">{{ net.latency }}</span>
+                    </div>
+                  </DataTooltip>
+                </div>
+                <div v-else class="truncate">
+                  N/A
+                </div>
+              </div>
+              <div class="flex min-w-0 items-center">
+                <span class="truncate">
+                  丢包
+                </span>
+                <div class="border-t-2 border-dotted border-gray-500/10 mx-2 flex-1" />
+                <div v-if="topPingNetworks.length > 0" class="flex shrink-0 items-center">
+                  <DataTooltip
+                    v-for="(net, index) in topPingNetworks" :key="net.name" placement="top"
+                    :content="`${net.name}\n延迟 ${net.latency}\n丢包 ${net.loss}`" content-class="whitespace-pre-wrap w-max px-1.5 !leading-[1.2] text-[11px]"
+                  >
+                    <div class="flex items-center whitespace-nowrap">
+                      <span v-if="index" class="mx-1">·</span>
+                      <span :class="net.lossToneClass">{{ net.loss }}</span>
                     </div>
                   </DataTooltip>
                 </div>
