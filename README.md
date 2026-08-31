@@ -4,6 +4,8 @@
 
 ![Komari Emerald Globe 主题预览](docs/preview.png)
 
+> 预览图取自真实部署环境。站点名称、节点/厂商名称、费用、到期信息、IP、访客位置及可识别主机的信息均已脱敏；资源用量、速率和延迟等实时数值仅用于展示界面效果。
+
 ## 功能特性
 
 - 彩色昼夜地球：基于 Three.js 与 Globe.gl，随亮色/暗色模式切换地球纹理。
@@ -14,6 +16,40 @@
 - 公开数据互不影响：个人价值选择不会修改首页面向所有访客的剩余价值统计。
 - 本地偏好保存：个人选择与显示币种只保存在当前浏览器中。
 - 响应式与性能优化：适配桌面和移动设备，页面不可见时暂停地球渲染。
+
+## 界面预览
+
+### 节点列表
+
+在紧凑表格中横向比较状态、标签、资源占用、实时速率与三网延迟。
+
+![Emerald Globe 节点列表视图](docs/screenshots/list-view.png)
+
+### 个人价值计算
+
+独立选择需要计入的服务器和显示币种，选择只保存在当前浏览器，不改变首页公开统计。
+
+![Emerald Globe 个人价值计算](docs/screenshots/personal-finance.png)
+
+### 节点详情
+
+集中展示硬件、系统、存储、网络信息以及实时资源状态。
+
+![Emerald Globe 节点详情](docs/screenshots/node-detail.png)
+
+### 性能与延迟图表
+
+查看 CPU、内存、磁盘、网络、连接数、进程和三网延迟趋势。
+
+![Emerald Globe 性能与延迟图表](docs/screenshots/performance-charts.png)
+
+### 移动端
+
+地球、汇总指标和节点卡片会根据窄屏重新排布，保留主要监控信息与操作入口。
+
+<p align="center">
+  <img src="docs/screenshots/home-mobile.png" width="390" alt="Emerald Globe 移动端视图">
+</p>
 
 ## 安装
 
