@@ -18,7 +18,7 @@ export interface NodePingStatsState {
   perTaskStats: NodePingPerTaskStat[]
 }
 
-interface PingRecord {
+export interface PingRecord {
   client: string
   task_id: number
   time: string
@@ -30,7 +30,7 @@ interface SharedPingRecordsResponse {
   tasks?: PingTaskInfo[]
 }
 
-interface PingTaskInfo {
+export interface PingTaskInfo {
   id: number
   name: string
 }
@@ -65,11 +65,6 @@ const FULL_LOSS_EPSILON = 1e-6
 const PING_RECORD_REFRESH_INTERVAL_MS = 60_000
 const sharedPingRecordsCache = new Map<number, SharedPingRecordsEntry>()
 
-interface TaskRecordSummary {
-  total: number
-  success: number
-}
-
 function createEmptyStats(): NodePingStatsState {
   return {
     avgLatency: 0,
@@ -91,29 +86,8 @@ function isFiniteNumber(value: unknown): value is number {
   return typeof value === 'number' && Number.isFinite(value)
 }
 
-function summarizeTaskRecords(records: PingRecord[]): Map<number, TaskRecordSummary> {
-  const summaries = new Map<number, TaskRecordSummary>()
-
-  for (const record of records) {
-    const summary = summaries.get(record.task_id) ?? { total: 0, success: 0 }
-    summary.total += 1
-    if (record.value >= 0) {
-      summary.success += 1
-    }
-    summaries.set(record.task_id, summary)
-  }
-
-  return summaries
-}
-
 function getIncludedTaskIds(records: PingRecord[]): Set<number> {
-  const recordSummaries = summarizeTaskRecords(records)
-
-  return new Set(
-    [...recordSummaries.entries()]
-      .filter(([, summary]) => summary.total > 0 && summary.success > 0)
-      .map(([taskId]) => taskId),
-  )
+  return new Set(records.map(record => record.task_id))
 }
 
 function getCacheKey(uuid: string, hours: number): string {
@@ -367,7 +341,7 @@ function getPercentile(values: number[], percentile: number): number | null {
   return lowerValue + (upperValue - lowerValue) * (position - lowerIndex)
 }
 
-function buildStats(records: PingRecord[], tasks: PingTaskInfo[]): NodePingStatsState {
+export function buildNodePingStats(records: PingRecord[], tasks: PingTaskInfo[]): NodePingStatsState {
   const includedTaskIds = getIncludedTaskIds(records)
 
   if (!includedTaskIds.size)
@@ -392,11 +366,12 @@ function buildStats(records: PingRecord[], tasks: PingTaskInfo[]): NodePingStats
       .map(record => record.value)
       .filter(value => value >= 0)
 
+    taskLossValues.push((recordsByTask.length - validValues.length) / recordsByTask.length * 100)
+
     if (!validValues.length)
       continue
 
     latencyValues.push(average(validValues))
-    taskLossValues.push((recordsByTask.length - validValues.length) / recordsByTask.length * 100)
 
     if (validValues.length > 1) {
       const p50 = getPercentile(validValues, 0.5)
@@ -494,7 +469,7 @@ export function useNodePingStats(
       return readStatsCache(nodeUuid, hours) ?? createEmptyStats()
 
     const records = state.recordsByClient.get(nodeUuid) ?? []
-    return records.length ? buildStats(records, state.tasks) : createEmptyStats()
+    return records.length ? buildNodePingStats(records, state.tasks) : createEmptyStats()
   })
 
   // 副作用：按需触发首次共享加载并维护 loading/error，不再命令式写入 stats。
