@@ -34,10 +34,6 @@ const EDGE_OR_OPERA_REGEX = /Edg|OPR/i
 const FIREFOX_VERSION_REGEX = /Firefox\/(\d+)/i
 const SAFARI_REGEX = /Safari/i
 const CHROME_REGEX = /Chrome/i
-const IPV4_SEGMENT_REGEX = /^\d+$/
-const IPV6_SEGMENT_REGEX = /^[\dA-F]{1,4}$/i
-const IPV6_DOUBLE_COLON = '::'
-
 const loading = ref(true)
 const device = ref('检测中')
 const browser = ref('检测中')
@@ -51,7 +47,6 @@ const expand = ref(false)
 
 const subtitle = computed(() => loading.value ? '检测中' : location.value || '网络访客')
 const flagSrc = computed(() => countryCode.value ? `/assets/flags/${countryCode.value}.svg` : '')
-const displayIp = computed(() => expand.value ? ip.value : maskIpForCollapsedState(ip.value))
 
 const visitorRows = computed<VisitorInfoRow[]>(() => [
   {
@@ -64,8 +59,9 @@ const visitorRows = computed<VisitorInfoRow[]>(() => [
     expandOnly: true,
   },
   {
-    value: displayIp.value,
+    value: ip.value,
     icon: 'tabler:brand-socket-io',
+    expandOnly: true,
   },
   {
     value: browser.value,
@@ -99,67 +95,6 @@ function formatVisitTime(date: Date): string {
     minute: '2-digit',
     hour12: false,
   }).format(date)
-}
-
-function maskIpForCollapsedState(value: string): string {
-  return maskIpv4Address(value) ?? maskIpv6Address(value) ?? value
-}
-
-function maskIpv4Address(value: string): string | null {
-  const segments = value.split('.')
-  if (segments.length !== 4 || segments.some(segment => !IPV4_SEGMENT_REGEX.test(segment))) {
-    return null
-  }
-
-  const [first, second, third, fourth] = segments as [string, string, string, string]
-
-  return [
-    first,
-    second,
-    '*'.repeat(third.length),
-    fourth,
-  ].join('.')
-}
-
-function maskIpv6Address(value: string): string | null {
-  const percentIndex = value.indexOf('%')
-  const address = percentIndex >= 0 ? value.slice(0, percentIndex) : value
-  const scope = percentIndex >= 0 ? value.slice(percentIndex + 1) : ''
-  if (!address.includes(':') || address.includes(':::')) {
-    return null
-  }
-
-  const doubleColonCount = address.split(IPV6_DOUBLE_COLON).length - 1
-  if (doubleColonCount > 1) {
-    return null
-  }
-
-  const segments = address.split(':')
-  if (segments.some((segment, index) => !isValidIpv6Segment(segment, index, segments))) {
-    return null
-  }
-
-  let maskedAddress = address
-  if (address.includes('::')) {
-    const [prefix = ''] = address.split('::')
-    const visibleSegments = prefix ? prefix.split(':').filter(Boolean).slice(0, 4) : []
-    maskedAddress = visibleSegments.length > 0 ? `${visibleSegments.join(':')}::*` : '::*'
-  }
-  else if (segments.length > 4) {
-    maskedAddress = `${segments.slice(0, 4).join(':')}:*`
-  }
-
-  return scope ? `${maskedAddress}%${scope}` : maskedAddress
-}
-
-function isValidIpv6Segment(segment: string, index: number, segments: string[]): boolean {
-  if (!segment) {
-    return true
-  }
-  if (segment.includes('.')) {
-    return index === segments.length - 1 && maskIpv4Address(segment) !== null
-  }
-  return IPV6_SEGMENT_REGEX.test(segment)
 }
 
 function detectClient(): VisitorClientData {
@@ -400,13 +335,18 @@ onMounted(async () => {
 <template>
   <div class="pointer-events-none fixed inset-x-0 bottom-2.5 z-30 flex justify-center">
     <div
-      class="pointer-events-auto cursor-default p-1.5 px-3 shadow-[-1px_-1px_0_background,0_0_16px_rgba(0,0,0,0.05)] transition-[border-radius,transform,background-color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] bg-background/30 backdrop-blur-sm"
+      role="button" tabindex="0"
+      class="pointer-events-auto cursor-pointer p-1.5 px-3 shadow-[-1px_-1px_0_background,0_0_16px_rgba(0,0,0,0.05)] transition-[border-radius,transform,background-color,box-shadow] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] bg-background/30 backdrop-blur-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/50"
       :class="[
         expand
           ? 'rounded-lg -translate-y-1 bg-background/38 shadow-[-1px_-1px_0_background,0_10px_28px_rgba(0,0,0,0.08)]'
           : 'rounded-xl',
       ]"
+      :aria-expanded="expand"
+      :aria-label="expand ? '收起访客详细信息' : '展开访客详细信息'"
       @click="expand = !expand"
+      @keydown.enter.prevent="expand = !expand"
+      @keydown.space.prevent="expand = !expand"
     >
       <TransitionGroup
         tag="div"
