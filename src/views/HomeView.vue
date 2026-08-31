@@ -7,9 +7,11 @@ import { useRouter } from 'vue-router'
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
+import { DataTooltip } from '@/components/ui/data-tooltip'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Empty } from '@/components/ui/empty'
 import { Input } from '@/components/ui/input'
+import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useBackgroundSurface } from '@/composables/useBackgroundSurface'
 import { useAppStore } from '@/stores/app'
@@ -188,6 +190,16 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
               </TabsList>
             </div>
             <div class="ml-auto search flex gap-2 items-center pointer-events-auto">
+              <DataTooltip
+                v-if="appStore.nodeViewMode === 'card'"
+                :content="appStore.showPingNetworkDetails ? '三网明细：逐网延迟 + 丢包' : '三网摘要：紧凑显示'"
+                placement="top" content-class="whitespace-nowrap text-[11px] px-2"
+              >
+                <Switch
+                  v-model="appStore.showPingNetworkDetails"
+                  :aria-label="appStore.showPingNetworkDetails ? '切换为三网摘要' : '切换为三网明细'"
+                />
+              </DataTooltip>
               <Button
                 variant="outline" size="icon" aria-label="卡片视图"
                 class="h-8 w-8 border-none shadow-none rounded-md"

@@ -19,12 +19,12 @@ const {
     <div v-if="topPingNetworks.length > 0" class="flex flex-row">
       <DataTooltip
         v-for="(net, index) in topPingNetworks" :key="net.name" placement="top"
-        :content="`${net.name}\n${net.latency}`"
+        :content="`${net.name}\n延迟 ${net.latency}\n丢包 ${net.loss}`"
         content-class="whitespace-pre-wrap w-max px-1.5 !leading-[1.2] text-[11px]"
       >
         <div class="truncate text-[10px]">
           <span v-if="index" class="mx-1">·</span>
-          <span :class="net.toneClass">{{ net.latency }}</span>
+          <span :class="net.latencyToneClass">{{ net.latency }}</span>
         </div>
       </DataTooltip>
     </div>

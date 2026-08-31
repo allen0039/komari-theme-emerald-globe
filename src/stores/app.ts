@@ -43,6 +43,7 @@ const useAppStore = defineStore('app', () => {
 
   // 使用 null 表示未设置，等待主题配置加载后决定
   const storedViewMode = useStorageAsync<NodeViewMode | null>('nodeViewMode', null, localStorage)
+  const showPingNetworkDetails = useStorageAsync<boolean>('showPingNetworkDetails', false, localStorage)
 
   // 计算属性：从主题配置获取默认视图模式
   const defaultViewMode = computed<NodeViewMode>(() => {
@@ -295,6 +296,11 @@ const useAppStore = defineStore('app', () => {
     }
   }, { immediate: true })
 
+  watch(showPingNetworkDetails, (value) => {
+    if (typeof value !== 'boolean')
+      showPingNetworkDetails.value = false
+  }, { immediate: true })
+
   // 计算当前是否为暗色模式
   const isDark = computed(() => {
     if (themeMode.value === 'auto') {
@@ -345,6 +351,7 @@ const useAppStore = defineStore('app', () => {
     lang,
     nodeSelectedGroup,
     nodeViewMode,
+    showPingNetworkDetails,
     defaultViewMode,
     rpcTransportMode,
     byteDecimals,

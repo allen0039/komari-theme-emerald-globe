@@ -55,10 +55,11 @@ export interface NodePingPerTaskStat {
   name: string
   avgLatency: number
   loss: number
+  history: NodePingHistoryPoint[]
 }
 
 export const NODE_PING_BAR_COUNT = 10
-const CACHE_VERSION = 6
+const CACHE_VERSION = 7
 const CACHE_KEY_PREFIX = 'komari-theme-emerald-globe:node-ping-stats'
 const FULL_LOSS_EPSILON = 1e-6
 const PING_RECORD_REFRESH_INTERVAL_MS = 60_000
@@ -144,6 +145,17 @@ function isValidStatsState(value: unknown): value is NodePingStatsState {
     && Array.isArray(state.history)
     && state.history.every(isValidHistoryPoint)
     && Array.isArray(state.perTaskStats)
+    && state.perTaskStats.every((stat) => {
+      if (!stat || typeof stat !== 'object')
+        return false
+      const task = stat as Record<string, unknown>
+      return typeof task.taskId === 'number'
+        && typeof task.name === 'string'
+        && typeof task.avgLatency === 'number'
+        && typeof task.loss === 'number'
+        && Array.isArray(task.history)
+        && task.history.every(isValidHistoryPoint)
+    })
 }
 
 function readStatsCache(uuid: string, hours: number): NodePingStatsState | null {
@@ -416,7 +428,7 @@ function buildStats(records: PingRecord[], tasks: PingTaskInfo[]): NodePingStats
       ? (taskRecs.length - validValues.length) / taskRecs.length * 100
       : 100
     const name = taskNameMap.get(taskId) ?? `Ping ${taskId}`
-    return { taskId, name, avgLatency, loss }
+    return { taskId, name, avgLatency, loss, history: buildPingHistory(taskRecs) }
   })
     .sort((a, b) => (taskOrderMap.get(a.taskId) ?? 0) - (taskOrderMap.get(b.taskId) ?? 0))
 

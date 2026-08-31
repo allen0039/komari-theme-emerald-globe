@@ -19,10 +19,15 @@ export interface NodePingBar {
   tooltip: string
 }
 
-interface NodePingNetworkDisplay {
+export interface NodePingNetworkDisplay {
   name: string
   latency: string
-  toneClass: string
+  loss: string
+  identityClass: string
+  latencyToneClass: string
+  lossToneClass: string
+  latencyBars: NodePingBar[]
+  lossBars: NodePingBar[]
 }
 
 interface UseNodePingDisplayOptions {
@@ -71,11 +76,58 @@ function getLossToneClass(loss: number): string {
   return 'bg-rose-500/80'
 }
 
-function toNetworkDisplay(stat: NodePingPerTaskStat): NodePingNetworkDisplay {
+function getLossTextToneClass(loss: number): string {
+  if (loss <= 1)
+    return 'text-emerald-600 dark:text-emerald-400'
+  if (loss <= 3)
+    return 'text-green-600 dark:text-green-400'
+  if (loss <= 6)
+    return 'text-lime-600 dark:text-lime-400'
+  if (loss <= 9)
+    return 'text-amber-600 dark:text-amber-400'
+  return 'text-rose-600 dark:text-rose-400'
+}
+
+function getNetworkIdentityClass(name: string, index: number): string {
+  const normalized = name.toLowerCase()
+  if (normalized.includes('联通') || normalized.includes('unicom'))
+    return 'bg-rose-500'
+  if (normalized.includes('电信') || normalized.includes('telecom'))
+    return 'bg-blue-500'
+  if (normalized.includes('移动') || normalized.includes('mobile'))
+    return 'bg-emerald-500'
+  return ['bg-rose-500', 'bg-blue-500', 'bg-emerald-500'][index] ?? 'bg-emerald-500'
+}
+
+function buildHistoryBars(points: NodePingPerTaskStat['history'], metric: NodePingMetric, prefix: string): NodePingBar[] {
+  return points.map((point, index) => {
+    const value = point[metric]
+    return {
+      key: `${prefix}-${point.time}-${index}`,
+      className: value === null
+        ? 'bg-muted-foreground/15'
+        : metric === 'latency'
+          ? getLatencyToneClass(value)
+          : getLossToneClass(value),
+      tooltip: value === null
+        ? `${formatDateTime(point.time, 'HH:mm:ss')} N/A`
+        : metric === 'latency'
+          ? `${formatDateTime(point.time, 'HH:mm:ss')}\n${Math.round(value)} ms`
+          : `${formatDateTime(point.time, 'HH:mm:ss')}\n${value.toFixed(1)}%`,
+    }
+  })
+}
+
+function toNetworkDisplay(stat: NodePingPerTaskStat, index: number): NodePingNetworkDisplay {
   return {
     name: stat.name,
     latency: stat.avgLatency >= 0 ? `${Math.round(stat.avgLatency)}ms` : '--',
-    toneClass: stat.avgLatency >= 0 ? getPingToneClass(stat.avgLatency) : 'text-rose-500',
+    loss: `${stat.loss.toFixed(1)}%`,
+    identityClass: getNetworkIdentityClass(stat.name, index),
+    latencyToneClass: stat.avgLatency >= 0 ? getPingToneClass(stat.avgLatency) : 'text-rose-500',
+    lossToneClass: getLossTextToneClass(stat.loss),
+    latencyBars: buildHistoryBars(stat.history, 'latency', `${stat.taskId}-latency`),
+    lossBars: buildHistoryBars(stat.history, 'loss', `${stat.taskId}-loss`),
   }
 }
 
@@ -101,24 +153,7 @@ export function useNodePingDisplay(
     const points = pingStats.history.value
     if (!points.length)
       return []
-
-    return points.map((point, index) => {
-      const value = point[metric]
-
-      return {
-        key: `${point.time}-${index}`,
-        className: value === null
-          ? 'bg-muted-foreground/15'
-          : metric === 'latency'
-            ? getLatencyToneClass(value)
-            : getLossToneClass(value),
-        tooltip: value === null
-          ? `${formatDateTime(point.time, 'HH:mm:ss')} N/A`
-          : metric === 'latency'
-            ? `${formatDateTime(point.time, 'HH:mm:ss')}\n${Math.round(value)} ms`
-            : `${formatDateTime(point.time, 'HH:mm:ss')}\n${value.toFixed(1)}%`,
-      }
-    })
+    return buildHistoryBars(points, metric, `summary-${metric}`)
   }
 
   function buildEmptyPingBars(metric: NodePingMetric): NodePingBar[] {
