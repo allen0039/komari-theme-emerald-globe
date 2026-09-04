@@ -7,11 +7,9 @@ import { useRouter } from 'vue-router'
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
-import { DataTooltip } from '@/components/ui/data-tooltip'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Empty } from '@/components/ui/empty'
 import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useBackgroundSurface } from '@/composables/useBackgroundSurface'
 import { useAppStore } from '@/stores/app'
@@ -190,16 +188,29 @@ function getNodeItemTransitionStyle(index: number): Record<string, string> {
               </TabsList>
             </div>
             <div class="ml-auto search flex gap-2 items-center pointer-events-auto">
-              <DataTooltip
+              <div
                 v-if="appStore.nodeViewMode === 'card'"
-                :content="appStore.showPingNetworkDetails ? '三网明细：逐网延迟 + 丢包' : '三网摘要：紧凑显示'"
-                placement="top" content-class="whitespace-nowrap text-[11px] px-2"
+                role="group" aria-label="三网显示模式"
+                class="flex h-8 items-center gap-0.5 rounded-md p-0.5"
+                :class="pickSurfaceClass('bg-background/60', 'bg-background/50 backdrop-blur-xs')"
               >
-                <Switch
-                  v-model="appStore.showPingNetworkDetails"
-                  :aria-label="appStore.showPingNetworkDetails ? '切换为三网摘要' : '切换为三网明细'"
-                />
-              </DataTooltip>
+                <Button
+                  variant="ghost" size="xs" aria-label="三网摘要" :aria-pressed="!appStore.showPingNetworkDetails"
+                  class="h-7 rounded-sm px-2 text-xs text-muted-foreground hover:bg-background/70 hover:text-foreground"
+                  :class="!appStore.showPingNetworkDetails ? '!bg-background !text-emerald-600 shadow-xs' : ''"
+                  @click="appStore.showPingNetworkDetails = false"
+                >
+                  摘要
+                </Button>
+                <Button
+                  variant="ghost" size="xs" aria-label="三网明细" :aria-pressed="appStore.showPingNetworkDetails"
+                  class="h-7 rounded-sm px-2 text-xs text-muted-foreground hover:bg-background/70 hover:text-foreground"
+                  :class="appStore.showPingNetworkDetails ? '!bg-background !text-emerald-600 shadow-xs' : ''"
+                  @click="appStore.showPingNetworkDetails = true"
+                >
+                  明细
+                </Button>
+              </div>
               <Button
                 variant="outline" size="icon" aria-label="卡片视图"
                 class="h-8 w-8 border-none shadow-none rounded-md"
